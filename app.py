@@ -623,9 +623,10 @@ with tab3:
 st.markdown(
     """
 <div class="app-footer">
-    Analisis Klasifikasi Penyakit Berdasarkan Gejala &copy; 2023 — Dibangun untuk tujuan edukasi dan simulasi.
+    Analisis Klasifikasi Penyakit Berdasarkan Gejala &copy; 2025 — Dibangun untuk tujuan edukasi dan simulasi.
 </div>
 </div>
 """,
     unsafe_allow_html=True
 )
+
