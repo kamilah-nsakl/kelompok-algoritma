@@ -1,7 +1,7 @@
 import streamlit as st
 
 st.title("Tes Streamlit")
-st.write("Kalau teks ini muncul, berarti app.py di folder yang benar dan Streamlit berjalan normal.")
+st.write
 
 # ============================
 # HEADER
@@ -160,3 +160,4 @@ st.caption("Sumber logika & tampilan berasal dari file HTML asli. :contentRefere
 
 st.write("---")
 st.write("© 2023 – Aplikasi Streamlit Analisis Penyakit")
+
