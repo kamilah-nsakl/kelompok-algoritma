@@ -1,685 +1,261 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analisis Klasifikasi Penyakit</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            background-color: #f5f7fa;
-            color: #333;
-            line-height: 1.6;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        header {
-            background: linear-gradient(135deg, #3498db, #2c3e50);
-            color: white;
-            padding: 30px 0;
-            text-align: center;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-        
-        h1 {
-            font-size: 2.2rem;
-            margin-bottom: 10px;
-        }
-        
-        .description {
-            font-size: 1.1rem;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-        
-        .section {
-            background-color: white;
-            border-radius: 10px;
-            padding: 25px;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-        }
-        
-        h2 {
-            color: #2c3e50;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #ecf0f1;
-        }
-        
-        .sample-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-            font-size: 0.9rem;
-        }
-        
-        .sample-table th {
-            background-color: #3498db;
-            color: white;
-            padding: 12px 15px;
-            text-align: center;
-        }
-        
-        .sample-table td {
-            padding: 10px 12px;
-            text-align: center;
-            border-bottom: 1px solid #ecf0f1;
-        }
-        
-        .sample-table tr:nth-child(even) {
-            background-color: #f8f9fa;
-        }
-        
-        .sample-table tr:hover {
-            background-color: #e8f4fc;
-        }
-        
-        .algorithm-cards {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            margin-top: 20px;
-        }
-        
-        .card {
-            flex: 1;
-            min-width: 300px;
-            background-color: white;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
-            transition: transform 0.3s ease;
-        }
-        
-        .card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .card h3 {
-            color: #2c3e50;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid;
-        }
-        
-        .card-knn h3 {
-            border-color: #e74c3c;
-        }
-        
-        .card-dt h3 {
-            border-color: #2ecc71;
-        }
-        
-        .card-nb h3 {
-            border-color: #f39c12;
-        }
-        
-        .metrics {
-            margin-top: 15px;
-        }
-        
-        .metric {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            padding-bottom: 8px;
-            border-bottom: 1px dashed #ecf0f1;
-        }
-        
-        .metric-name {
-            font-weight: 600;
-        }
-        
-        .metric-value {
-            font-weight: 700;
-        }
-        
-        .comparison-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        
-        .comparison-table th, .comparison-table td {
-            padding: 12px 15px;
-            text-align: center;
-            border: 1px solid #ddd;
-        }
-        
-        .comparison-table th {
-            background-color: #2c3e50;
-            color: white;
-        }
-        
-        .comparison-table tr:nth-child(even) {
-            background-color: #f8f9fa;
-        }
-        
-        .best-metric {
-            background-color: #d4edda;
-            font-weight: bold;
-        }
-        
-        .prediction-form {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-top: 20px;
-        }
-        
-        .symptom-group {
-            flex: 1;
-            min-width: 200px;
-        }
-        
-        .symptom-group h4 {
-            margin-bottom: 10px;
-            color: #2c3e50;
-        }
-        
-        .checkbox-item {
-            margin-bottom: 8px;
-        }
-        
-        .checkbox-item label {
-            margin-left: 8px;
-        }
-        
-        .predict-btn {
-            background-color: #3498db;
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1rem;
-            margin-top: 20px;
-            transition: background-color 0.3s;
-            display: block;
-            width: 100%;
-        }
-        
-        .predict-btn:hover {
-            background-color: #2980b9;
-        }
-        
-        .result {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 5px;
-            background-color: #e8f4fc;
-            display: none;
-        }
-        
-        .result h4 {
-            margin-bottom: 10px;
-            color: #2c3e50;
-        }
-        
-        .algorithm-result {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-            padding-bottom: 8px;
-            border-bottom: 1px dashed #bdc3c7;
-        }
-        
-        .confidence {
-            font-size: 0.9em;
-            color: #7f8c8d;
-        }
-        
-        footer {
-            text-align: center;
-            margin-top: 40px;
-            padding: 20px;
-            color: #7f8c8d;
-            font-size: 0.9rem;
-        }
-        
-        @media (max-width: 768px) {
-            .algorithm-cards {
-                flex-direction: column;
-            }
-            
-            .card {
-                min-width: 100%;
-            }
-            
-            .sample-table {
-                font-size: 0.8rem;
-            }
-            
-            .sample-table th, .sample-table td {
-                padding: 8px 5px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <header>
-            <h1>Analisis Penerapan Algoritma Klasifikasi Penyakit</h1>
-            <p class="description">Perbandingan K-Nearest Neighbor, Decision Tree, dan Naïve Bayes dalam Klasifikasi Penyakit Berdasarkan Gejala</p>
-        </header>
-        
-        <section class="section">
-            <h2>Sampel Data Penyakit</h2>
-            <p>Berikut adalah 20 sampel data dari dataset klasifikasi penyakit berdasarkan gejala:</p>
-            
-            <table class="sample-table">
-                <thead>
-                    <tr>
-                        <th>Demam</th>
-                        <th>Batuk</th>
-                        <th>Kelelahan</th>
-                        <th>Sakit Kepala</th>
-                        <th>Nyeri Tenggorokan</th>
-                        <th>Ruam</th>
-                        <th>Muntah</th>
-                        <th>Diare</th>
-                        <th>Sesak Napas</th>
-                        <th>Nyeri Dada</th>
-                        <th>Penyakit</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>Flu</td>
-                    </tr>
-                    <tr>
-                        <td>0</td><td>1</td><td>1</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>Flu</td>
-                    </tr>
-                    <tr>
-                        <td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td><td>Flu</td>
-                    </tr>
-                    <tr>
-                        <td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>Flu</td>
-                    </tr>
-                    <tr>
-                        <td>1</td><td>1</td><td>0</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>Flu</td>
-                    </tr>
-                    <tr>
-                        <td>1</td><td>0</td><td>1</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>Demam Berdarah</td>
-                    </tr>
-                    <tr>
-                        <td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>Demam Berdarah</td>
-                    </tr>
-                    <tr>
-                        <td>1</td><td>0</td><td>1</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>Demam Berdarah</td>
-                    </tr>
-                    <tr>
-                        <td>1</td><td>1</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td><td>COVID-19</td>
-                    </tr>
-                    <tr>
-                        <td>1</td><td>1</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td><td>COVID-19</td>
-                    </tr>
-                    <tr>
-                        <td>1</td><td>0</td><td>1</td><td>1</td><td>0</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td><td>Tifus</td>
-                    </tr>
-                    <tr>
-                        <td>1</td><td>0</td><td>1</td><td>1</td><td>0</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td><td>Tifus</td>
-                    </tr>
-                    <tr>
-                        <td>0</td><td>1</td><td>0</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>Alergi</td>
-                    </tr>
-                    <tr>
-                        <td>0</td><td>1</td><td>0</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>Alergi</td>
-                    </tr>
-                    <tr>
-                        <td>0</td><td>0</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>Migrain</td>
-                    </tr>
-                    <tr>
-                        <td>0</td><td>0</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>Migrain</td>
-                    </tr>
-                    <tr>
-                        <td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>0</td><td>0</td><td>Gastroenteritis</td>
-                    </tr>
-                    <tr>
-                        <td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td><td>0</td><td>Gastroenteritis</td>
-                    </tr>
-                    <tr>
-                        <td>0</td><td>0</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>Pneumonia</td>
-                    </tr>
-                    <tr>
-                        <td>1</td><td>1</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>Pneumonia</td>
-                    </tr>
-                </tbody>
-            </table>
-        </section>
-        
-        <section class="section">
-            <h2>Analisis Algoritma Klasifikasi</h2>
-            <p>Berikut adalah perbandingan performa tiga algoritma klasifikasi yang diterapkan pada dataset penyakit:</p>
-            
-            <div class="algorithm-cards">
-                <div class="card card-knn">
-                    <h3>K-Nearest Neighbor (K-NN)</h3>
-                    <p>Algoritma berbasis instance yang mengklasifikasikan data berdasarkan kedekatan dengan tetangga terdekat.</p>
-                    <div class="metrics">
-                        <div class="metric">
-                            <span class="metric-name">Akurasi</span>
-                            <span class="metric-value">87.5%</span>
-                        </div>
-                        <div class="metric">
-                            <span class="metric-name">Presisi</span>
-                            <span class="metric-value">85.2%</span>
-                        </div>
-                        <div class="metric">
-                            <span class="metric-name">Recall</span>
-                            <span class="metric-value">86.8%</span>
-                        </div>
-                        <div class="metric">
-                            <span class="metric-name">F1-Score</span>
-                            <span class="metric-value">86.0%</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="card card-dt">
-                    <h3>Decision Tree</h3>
-                    <p>Algoritma berbasis pohon keputusan yang membagi data berdasarkan nilai atribut.</p>
-                    <div class="metrics">
-                        <div class="metric">
-                            <span class="metric-name">Akurasi</span>
-                            <span class="metric-value">91.2%</span>
-                        </div>
-                        <div class="metric">
-                            <span class="metric-name">Presisi</span>
-                            <span class="metric-value">90.5%</span>
-                        </div>
-                        <div class="metric">
-                            <span class="metric-name">Recall</span>
-                            <span class="metric-value">89.8%</span>
-                        </div>
-                        <div class="metric">
-                            <span class="metric-name">F1-Score</span>
-                            <span class="metric-value">90.1%</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="card card-nb">
-                    <h3>Naïve Bayes</h3>
-                    <p>Algoritma probabilistik berdasarkan Teorema Bayes dengan asumsi independensi antar fitur.</p>
-                    <div class="metrics">
-                        <div class="metric">
-                            <span class="metric-name">Akurasi</span>
-                            <span class="metric-value">83.7%</span>
-                        </div>
-                        <div class="metric">
-                            <span class="metric-name">Presisi</span>
-                            <span class="metric-value">82.1%</span>
-                        </div>
-                        <div class="metric">
-                            <span class="metric-name">Recall</span>
-                            <span class="metric-value">84.3%</span>
-                        </div>
-                        <div class="metric">
-                            <span class="metric-name">F1-Score</span>
-                            <span class="metric-value">83.2%</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <h3 style="margin-top: 30px;">Perbandingan Performa</h3>
-            <table class="comparison-table">
-                <thead>
-                    <tr>
-                        <th>Metrik</th>
-                        <th>K-NN</th>
-                        <th>Decision Tree</th>
-                        <th>Naïve Bayes</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Akurasi</td>
-                        <td>87.5%</td>
-                        <td class="best-metric">91.2%</td>
-                        <td>83.7%</td>
-                    </tr>
-                    <tr>
-                        <td>Presisi</td>
-                        <td>85.2%</td>
-                        <td class="best-metric">90.5%</td>
-                        <td>82.1%</td>
-                    </tr>
-                    <tr>
-                        <td>Recall</td>
-                        <td>86.8%</td>
-                        <td class="best-metric">89.8%</td>
-                        <td>84.3%</td>
-                    </tr>
-                    <tr>
-                        <td>F1-Score</td>
-                        <td>86.0%</td>
-                        <td class="best-metric">90.1%</td>
-                        <td>83.2%</td>
-                    </tr>
-                    <tr>
-                        <td>Waktu Pelatihan</td>
-                        <td>Sedang</td>
-                        <td>Cepat</td>
-                        <td class="best-metric">Sangat Cepat</td>
-                    </tr>
-                    <tr>
-                        <td>Interpretabilitas</td>
-                        <td>Rendah</td>
-                        <td class="best-metric">Tinggi</td>
-                        <td>Sedang</td>
-                    </tr>
-                </tbody>
-            </table>
-        </section>
-        
-        <section class="section">
-            <h2>Simulasi Prediksi Penyakit</h2>
-            <p>Pilih gejala yang dialami untuk melihat prediksi dari ketiga algoritma:</p>
-            
-            <div class="prediction-form">
-                <div class="symptom-group">
-                    <h4>Gejala Umum</h4>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="demam">
-                        <label for="demam">Demam</label>
-                    </div>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="batuk">
-                        <label for="batuk">Batuk</label>
-                    </div>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="kelelahan">
-                        <label for="kelelahan">Kelelahan</label>
-                    </div>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="sakit-kepala">
-                        <label for="sakit-kepala">Sakit Kepala</label>
-                    </div>
-                </div>
-                
-                <div class="symptom-group">
-                    <h4>Gejala Pernapasan & Pencernaan</h4>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="nyeri-tenggorokan">
-                        <label for="nyeri-tenggorokan">Nyeri Tenggorokan</label>
-                    </div>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="sesak-napas">
-                        <label for="sesak-napas">Sesak Napas</label>
-                    </div>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="muntah">
-                        <label for="muntah">Muntah</label>
-                    </div>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="diare">
-                        <label for="diare">Diare</label>
-                    </div>
-                </div>
-                
-                <div class="symptom-group">
-                    <h4>Gejala Lainnya</h4>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="ruam">
-                        <label for="ruam">Ruam</label>
-                    </div>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="nyeri-dada">
-                        <label for="nyeri-dada">Nyeri Dada</label>
-                    </div>
-                </div>
-            </div>
-            
-            <button class="predict-btn" id="predict-btn">Prediksi Penyakit</button>
-            
-            <div class="result" id="prediction-result">
-                <h4>Hasil Prediksi:</h4>
-                <div class="algorithm-result">
-                    <span>K-Nearest Neighbor:</span>
-                    <span id="knn-result">-</span>
-                </div>
-                <div class="algorithm-result">
-                    <span>Decision Tree:</span>
-                    <span id="dt-result">-</span>
-                </div>
-                <div class="algorithm-result">
-                    <span>Naïve Bayes:</span>
-                    <span id="nb-result">-</span>
-                </div>
-            </div>
-        </section>
-        
-        <footer>
-            <p>Analisis Klasifikasi Penyakit Berdasarkan Gejala &copy; 2023</p>
-        </footer>
-    </div>
+import streamlit as st
+import pandas as pd
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Inisialisasi event listener untuk tombol prediksi
-            document.getElementById('predict-btn').addEventListener('click', predictDisease);
-            
-            // Fungsi prediksi penyakit
-            function predictDisease() {
-                // Mengumpulkan gejala yang dipilih
-                const symptoms = {
-                    demam: document.getElementById('demam').checked,
-                    batuk: document.getElementById('batuk').checked,
-                    kelelahan: document.getElementById('kelelahan').checked,
-                    sakitKepala: document.getElementById('sakit-kepala').checked,
-                    nyeriTenggorokan: document.getElementById('nyeri-tenggorokan').checked,
-                    sesakNapas: document.getElementById('sesak-napas').checked,
-                    muntah: document.getElementById('muntah').checked,
-                    diare: document.getElementById('diare').checked,
-                    ruam: document.getElementById('ruam').checked,
-                    nyeriDada: document.getElementById('nyeri-dada').checked
-                };
-                
-                // Menghitung jumlah gejala yang dipilih
-                const symptomCount = Object.values(symptoms).filter(val => val).length;
-                
-                // Jika tidak ada gejala yang dipilih
-                if (symptomCount === 0) {
-                    alert('Pilih setidaknya satu gejala untuk prediksi.');
-                    return;
-                }
-                
-                // Logika prediksi sederhana berdasarkan kombinasi gejala
-                let knnPrediction, dtPrediction, nbPrediction;
-                let knnConfidence, dtConfidence, nbConfidence;
-                
-                // Prediksi berdasarkan kombinasi gejala tertentu
-                if (symptoms.demam && symptoms.batuk && symptoms.nyeriTenggorokan) {
-                    knnPrediction = "Flu";
-                    knnConfidence = "87%";
-                    dtPrediction = "Flu";
-                    dtConfidence = "92%";
-                    nbPrediction = "Flu";
-                    nbConfidence = "85%";
-                } else if (symptoms.demam && symptoms.ruam && !symptoms.batuk) {
-                    knnPrediction = "Demam Berdarah";
-                    knnConfidence = "82%";
-                    dtPrediction = "Demam Berdarah";
-                    dtConfidence = "89%";
-                    nbPrediction = "Demam Berdarah";
-                    nbConfidence = "79%";
-                } else if (symptoms.demam && symptoms.sesakNapas && symptoms.batuk) {
-                    knnPrediction = "COVID-19";
-                    knnConfidence = "85%";
-                    dtPrediction = "COVID-19";
-                    dtConfidence = "91%";
-                    nbPrediction = "COVID-19";
-                    nbConfidence = "83%";
-                } else if (symptoms.demam && symptoms.muntah && symptoms.diare) {
-                    knnPrediction = "Gastroenteritis";
-                    knnConfidence = "84%";
-                    dtPrediction = "Gastroenteritis";
-                    dtConfidence = "88%";
-                    nbPrediction = "Gastroenteritis";
-                    nbConfidence = "81%";
-                } else if (symptoms.sakitKepala && !symptoms.demam) {
-                    knnPrediction = "Migrain";
-                    knnConfidence = "79%";
-                    dtPrediction = "Migrain";
-                    dtConfidence = "85%";
-                    nbPrediction = "Migrain";
-                    nbConfidence = "76%";
-                } else if (symptoms.sesakNapas && symptoms.nyeriDada) {
-                    knnPrediction = "Pneumonia";
-                    knnConfidence = "86%";
-                    dtPrediction = "Pneumonia";
-                    dtConfidence = "90%";
-                    nbPrediction = "Pneumonia";
-                    nbConfidence = "82%";
-                } else if (symptoms.batuk && symptoms.nyeriTenggorokan && !symptoms.demam) {
-                    knnPrediction = "Alergi";
-                    knnConfidence = "81%";
-                    dtPrediction = "Alergi";
-                    dtConfidence = "87%";
-                    nbPrediction = "Alergi";
-                    nbConfidence = "78%";
-                } else if (symptoms.demam && symptoms.muntah && !symptoms.diare) {
-                    knnPrediction = "Tifus";
-                    knnConfidence = "83%";
-                    dtPrediction = "Tifus";
-                    dtConfidence = "86%";
-                    nbPrediction = "Tifus";
-                    nbConfidence = "80%";
-                } else {
-                    knnPrediction = "Tidak dapat diprediksi dengan pasti";
-                    knnConfidence = "";
-                    dtPrediction = "Tidak dapat diprediksi dengan pasti";
-                    dtConfidence = "";
-                    nbPrediction = "Tidak dapat diprediksi dengan pasti";
-                    nbConfidence = "";
-                }
-                
-                // Menampilkan hasil prediksi
-                document.getElementById('knn-result').innerHTML = `${knnPrediction} <span class="confidence">${knnConfidence}</span>`;
-                document.getElementById('dt-result').innerHTML = `${dtPrediction} <span class="confidence">${dtConfidence}</span>`;
-                document.getElementById('nb-result').innerHTML = `${nbPrediction} <span class="confidence">${nbConfidence}</span>`;
-                
-                // Menampilkan bagian hasil
-                document.getElementById('prediction-result').style.display = 'block';
-            }
-        });
-    </script>
-</body>
-</html>
+# -------------------------------------------------
+# Konfigurasi dasar halaman
+# -------------------------------------------------
+st.set_page_config(
+    page_title="Analisis Klasifikasi Penyakit",
+    layout="wide"
+)
+
+# -------------------------------------------------
+# HEADER
+# -------------------------------------------------
+st.markdown(
+    """
+    <style>
+    .main-title {
+        text-align: center;
+        font-size: 2.0rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 5px;
+    }
+    .subtitle {
+        text-align: center;
+        font-size: 1.0rem;
+        color: #555;
+        margin-bottom: 25px;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+st.markdown(
+    "<div class='main-title'>Analisis Penerapan Algoritma Klasifikasi Penyakit</div>",
+    unsafe_allow_html=True
+)
+st.markdown(
+    "<div class='subtitle'>Perbandingan K-Nearest Neighbor, Decision Tree, dan Naïve Bayes dalam Klasifikasi Penyakit Berdasarkan Gejala</div>",
+    unsafe_allow_html=True
+)
+
+st.write("---")
+
+# -------------------------------------------------
+# DATASET SAMPLE (20 data seperti di HTML)
+# -------------------------------------------------
+st.header("Sampel Data Penyakit")
+
+st.write(
+    "Berikut adalah 20 sampel data dari dataset klasifikasi penyakit "
+    "berdasarkan gejala:"
+)
+
+data = [
+    [1,1,1,1,1,0,0,0,0,0,"Flu"],
+    [0,1,1,1,1,0,0,0,0,0,"Flu"],
+    [1,1,1,1,1,0,0,0,0,1,"Flu"],
+    [1,1,1,1,1,0,0,0,0,0,"Flu"],
+    [1,1,0,1,1,0,0,0,0,0,"Flu"],
+    [1,0,1,1,0,1,0,0,0,0,"Demam Berdarah"],
+    [1,0,1,0,0,0,0,0,0,0,"Demam Berdarah"],
+    [1,0,1,1,0,1,0,0,0,0,"Demam Berdarah"],
+    [1,1,1,1,0,0,0,0,1,0,"COVID-19"],
+    [1,1,1,1,0,0,0,0,1,0,"COVID-19"],
+    [1,0,1,1,0,0,1,0,0,0,"Tifus"],
+    [1,0,1,1,0,0,1,0,0,0,"Tifus"],
+    [0,1,0,0,1,0,0,0,0,0,"Alergi"],
+    [0,1,0,0,1,0,0,0,0,0,"Alergi"],
+    [0,0,1,1,0,0,0,0,0,0,"Migrain"],
+    [0,0,0,1,0,0,0,0,0,0,"Migrain"],
+    [1,0,1,0,0,0,1,1,0,0,"Gastroenteritis"],
+    [1,0,1,0,0,0,1,1,1,0,"Gastroenteritis"],
+    [0,0,1,1,0,0,0,0,1,1,"Pneumonia"],
+    [1,1,1,1,0,0,0,0,1,1,"Pneumonia"],
+]
+
+columns = [
+    "Demam", "Batuk", "Kelelahan", "Sakit Kepala", "Nyeri Tenggorokan",
+    "Ruam", "Muntah", "Diare", "Sesak Napas", "Nyeri Dada", "Penyakit"
+]
+
+df_sample = pd.DataFrame(data, columns=columns)
+
+st.dataframe(df_sample, use_container_width=True)
+
+st.write("---")
+
+# -------------------------------------------------
+# ANALISIS ALGORITMA & METRIK
+# -------------------------------------------------
+st.header("Analisis Algoritma Klasifikasi")
+
+st.write(
+    "Berikut adalah perbandingan performa tiga algoritma klasifikasi "
+    "yang diterapkan pada dataset penyakit:"
+)
+
+col_knn, col_dt, col_nb = st.columns(3)
+
+with col_knn:
+    st.subheader("K-Nearest Neighbor (KNN)")
+    st.write(
+        "Algoritma berbasis instance yang mengklasifikasikan data "
+        "berdasarkan kedekatan dengan tetangga terdekat."
+    )
+    st.metric("Akurasi", "87.5%")
+    st.metric("Presisi", "85.2%")
+    st.metric("Recall", "86.8%")
+    st.metric("F1-Score", "86.0%")
+
+with col_dt:
+    st.subheader("Decision Tree")
+    st.write(
+        "Algoritma berbasis pohon keputusan yang membagi data "
+        "berdasarkan nilai atribut."
+    )
+    st.metric("Akurasi", "91.2%")
+    st.metric("Presisi", "90.5%")
+    st.metric("Recall", "89.8%")
+    st.metric("F1-Score", "90.1%")
+
+with col_nb:
+    st.subheader("Naïve Bayes")
+    st.write(
+        "Algoritma probabilistik berdasarkan Teorema Bayes dengan "
+        "asumsi independensi antar fitur."
+    )
+    st.metric("Akurasi", "83.7%")
+    st.metric("Presisi", "82.1%")
+    st.metric("Recall", "84.3%")
+    st.metric("F1-Score", "83.2%")
+
+st.subheader("Perbandingan Performa")
+
+df_metrics = pd.DataFrame(
+    {
+        "Metrik": ["Akurasi", "Presisi", "Recall", "F1-Score", "Waktu Pelatihan", "Interpretabilitas"],
+        "K-NN": ["87.5%", "85.2%", "86.8%", "86.0%", "Sedang", "Rendah"],
+        "Decision Tree": ["91.2%", "90.5%", "89.8%", "90.1%", "Cepat", "Tinggi"],
+        "Naïve Bayes": ["83.7%", "82.1%", "84.3%", "83.2%", "Sangat Cepat", "Sedang"],
+    }
+)
+
+st.table(df_metrics)
+
+st.write("---")
+
+# -------------------------------------------------
+# SIMULASI PREDIKSI PENYAKIT (LOGIKA SAMA DENGAN JAVASCRIPT)
+# -------------------------------------------------
+st.header("Simulasi Prediksi Penyakit")
+st.write("Pilih gejala yang dialami untuk melihat prediksi dari ketiga algoritma:")
+
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    st.subheader("Gejala Umum")
+    demam = st.checkbox("Demam")
+    batuk = st.checkbox("Batuk")
+    kelelahan = st.checkbox("Kelelahan")
+    sakit_kepala = st.checkbox("Sakit Kepala")
+
+with col2:
+    st.subheader("Gejala Pernapasan & Pencernaan")
+    nyeri_tenggorokan = st.checkbox("Nyeri Tenggorokan")
+    sesak_napas = st.checkbox("Sesak Napas")
+    muntah = st.checkbox("Muntah")
+    diare = st.checkbox("Diare")
+
+with col3:
+    st.subheader("Gejala Lainnya")
+    ruam = st.checkbox("Ruam")
+    nyeri_dada = st.checkbox("Nyeri Dada")
+
+# Tombol prediksi
+if st.button("Prediksi Penyakit"):
+    symptoms = {
+        "demam": demam,
+        "batuk": batuk,
+        "kelelahan": kelelahan,
+        "sakitKepala": sakit_kepala,
+        "nyeriTenggorokan": nyeri_tenggorokan,
+        "sesakNapas": sesak_napas,
+        "muntah": muntah,
+        "diare": diare,
+        "ruam": ruam,
+        "nyeriDada": nyeri_dada,
+    }
+
+    symptom_count = sum(symptoms.values())
+
+    if symptom_count == 0:
+        st.warning("Silakan pilih minimal satu gejala untuk melakukan prediksi.")
+    else:
+        # Logika rule-based sama dengan JavaScript pada HTML
+        if demam and batuk and nyeri_tenggorokan:
+            knnPrediction, knnConf = "Flu", "87%"
+            dtPrediction, dtConf = "Flu", "92%"
+            nbPrediction, nbConf = "Flu", "85%"
+
+        elif demam and ruam and (not batuk):
+            knnPrediction, knnConf = "Demam Berdarah", "82%"
+            dtPrediction, dtConf = "Demam Berdarah", "89%"
+            nbPrediction, nbConf = "Demam Berdarah", "79%"
+
+        elif demam and sesak_napas and batuk:
+            knnPrediction, knnConf = "COVID-19", "85%"
+            dtPrediction, dtConf = "COVID-19", "91%"
+            nbPrediction, nbConf = "COVID-19", "83%"
+
+        elif demam and muntah and diare:
+            knnPrediction, knnConf = "Gastroenteritis", "84%"
+            dtPrediction, dtConf = "Gastroenteritis", "88%"
+            nbPrediction, nbConf = "Gastroenteritis", "81%"
+
+        elif sakit_kepala and (not demam):
+            knnPrediction, knnConf = "Migrain", "79%"
+            dtPrediction, dtConf = "Migrain", "85%"
+            nbPrediction, nbConf = "Migrain", "76%"
+
+        elif sesak_napas and nyeri_dada:
+            knnPrediction, knnConf = "Pneumonia", "86%"
+            dtPrediction, dtConf = "Pneumonia", "90%"
+            nbPrediction, nbConf = "Pneumonia", "82%"
+
+        elif batuk and nyeri_tenggorokan and (not demam):
+            knnPrediction, knnConf = "Alergi", "81%"
+            dtPrediction, dtConf = "Alergi", "87%"
+            nbPrediction, nbConf = "Alergi", "78%"
+
+        elif demam and muntah and (not diare):
+            knnPrediction, knnConf = "Tifus", "83%"
+            dtPrediction, dtConf = "Tifus", "86%"
+            nbPrediction, nbConf = "Tifus", "80%"
+
+        else:
+            knnPrediction, knnConf = "Tidak dapat diprediksi dengan pasti", ""
+            dtPrediction, dtConf = "Tidak dapat diprediksi dengan pasti", ""
+            nbPrediction, nbConf = "Tidak dapat diprediksi dengan pasti", ""
+
+        st.subheader("Hasil Prediksi")
+
+        colA, colB, colC = st.columns(3)
+        with colA:
+            st.markdown("### K-Nearest Neighbor")
+            st.info(f"**{knnPrediction}**  \nTingkat keyakinan: {knnConf}")
+        with colB:
+            st.markdown("### Decision Tree")
+            st.success(f"**{dtPrediction}**  \nTingkat keyakinan: {dtConf}")
+        with colC:
+            st.markdown("### Naïve Bayes")
+            st.warning(f"**{nbPrediction}**  \nTingkat keyakinan: {nbConf}")
+
+st.write("---")
+st.caption(
+    "Aplikasi ini dibangun berdasarkan template HTML analisis klasifikasi penyakit "
+    "yang kemudian diadaptasi ke dalam Streamlit. :contentReference[oaicite:0]{index=0}"
+)
