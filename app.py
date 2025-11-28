@@ -1,288 +1,545 @@
 import streamlit as st
 
-# -------------------------------------------------
-# KONFIGURASI HALAMAN
-# -------------------------------------------------
-st.set_page_config(
-    page_title="Analisis Klasifikasi Penyakit",
-    layout="wide"
-)
+st.set_page_config(page_title="Analisis Klasifikasi Penyakit", layout="wide")
 
-# -------------------------------------------------
-# CUSTOM CSS UNTUK DESAIN
-# -------------------------------------------------
-st.markdown(
-    """
-    <style>
-    /* Background halaman */
-    .stApp {
-        background: linear-gradient(135deg, #eef2f7 0%, #dbeafe 50%, #eef2ff 100%);
-        font-family: "Segoe UI", sans-serif;
-    }
+# =========================
+# CSS (diambil langsung dari HTML asli)
+# =========================
+st.markdown("""
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
 
-    /* Container utama */
-    .main-container {
-        background-color: rgba(255, 255, 255, 0.85);
-        padding: 25px 30px;
-        border-radius: 18px;
-        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.15);
-        margin-bottom: 25px;
-        border: 1px solid rgba(148, 163, 184, 0.3);
-    }
+body {
+    background-color: #f5f7fa;
+    color: #333;
+    line-height: 1.6;
+}
 
-    /* Judul utama */
-    .main-title {
-        text-align: center;
-        font-size: 2.1rem;
-        font-weight: 800;
-        color: #111827;
-        letter-spacing: .03em;
-        margin-bottom: 6px;
-    }
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
 
-    .subtitle {
-        text-align: center;
-        font-size: 0.95rem;
-        color: #4b5563;
-        margin-bottom: 18px;
-    }
+header {
+    background: linear-gradient(135deg, #3498db, #2c3e50);
+    color: white;
+    padding: 30px 0;
+    text-align: center;
+    border-radius: 10px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
 
-    .badge {
-        display: inline-block;
-        padding: 4px 10px;
-        border-radius: 999px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        letter-spacing: .08em;
-        text-transform: uppercase;
-        background: rgba(59, 130, 246, 0.1);
-        color: #1d4ed8;
-        margin-bottom: 8px;
-    }
+h1 {
+    font-size: 2.2rem;
+    margin-bottom: 10px;
+}
 
-    /* Garis pemisah halus */
-    .soft-divider {
-        height: 1px;
-        background: linear-gradient(to right, transparent, #cbd5f5, transparent);
-        margin: 10px 0 20px 0;
-    }
+.description {
+    font-size: 1.1rem;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
 
-    /* Kartu algoritma */
-    .algo-card {
-        background: linear-gradient(135deg, #f9fafb, #eef2ff);
-        border-radius: 16px;
-        padding: 16px 18px;
-        border: 1px solid rgba(148, 163, 184, 0.4);
-        box-shadow: 0 4px 12px rgba(148, 163, 184, 0.25);
-    }
-    .algo-title {
-        font-size: 1.05rem;
-        font-weight: 700;
-        margin-bottom: 4px;
-    }
-    .algo-sub {
-        font-size: 0.82rem;
-        color: #4b5563;
-        margin-bottom: 10px;
-    }
-    .algo-tag {
-        display: inline-block;
-        font-size: 0.7rem;
-        padding: 2px 8px;
-        border-radius: 999px;
-        margin-bottom: 6px;
-        font-weight: 600;
-    }
-    .tag-knn { background: rgba(239, 68, 68, 0.1); color: #b91c1c; }
-    .tag-dt  { background: rgba(34, 197, 94, 0.1); color: #166534; }
-    .tag-nb  { background: rgba(245, 158, 11, 0.1); color: #92400e; }
+.section {
+    background-color: white;
+    border-radius: 10px;
+    padding: 25px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
 
-    .metric-row {
-        display: flex;
-        justify-content: space-between;
-        font-size: 0.82rem;
-        padding: 2px 0;
-    }
-    .metric-name {
-        color: #4b5563;
-    }
-    .metric-value {
-        font-weight: 700;
-        color: #111827;
-    }
+h2 {
+    color: #2c3e50;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #ecf0f1;
+}
 
-    /* Panel gejala */
-    .section-title {
-        font-size: 1.1rem;
-        font-weight: 700;
-        color: #111827;
-        margin-bottom: 2px;
-    }
-    .section-caption {
-        font-size: 0.85rem;
-        color: #6b7280;
-        margin-bottom: 8px;
-    }
+.sample-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 0.9rem;
+}
 
-    /* Hasil prediksi */
-    .result-card {
-        background: linear-gradient(135deg, #eff6ff, #e0f2fe);
-        border-radius: 16px;
-        padding: 16px 18px;
-        border: 1px solid rgba(59, 130, 246, 0.4);
-        box-shadow: 0 6px 18px rgba(37, 99, 235, 0.25);
+.sample-table th {
+    background-color: #3498db;
+    color: white;
+    padding: 12px 15px;
+    text-align: center;
+}
+
+.sample-table td {
+    padding: 10px 12px;
+    text-align: center;
+    border-bottom: 1px solid #ecf0f1;
+}
+
+.sample-table tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+.sample-table tr:hover {
+    background-color: #e8f4fc;
+}
+
+.algorithm-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.card {
+    flex: 1;
+    min-width: 300px;
+    background-color: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card h3 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid;
+}
+
+.card-knn h3 {
+    border-color: #e74c3c;
+}
+
+.card-dt h3 {
+    border-color: #2ecc71;
+}
+
+.card-nb h3 {
+    border-color: #f39c12;
+}
+
+.metrics {
+    margin-top: 15px;
+}
+
+.metric {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px dashed #ecf0f1;
+}
+
+.metric-name {
+    font-weight: 600;
+}
+
+.metric-value {
+    font-weight: 700;
+}
+
+.comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.comparison-table th, .comparison-table td {
+    padding: 12px 15px;
+    text-align: center;
+    border: 1px solid #ddd;
+}
+
+.comparison-table th {
+    background-color: #2c3e50;
+    color: white;
+}
+
+.comparison-table tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+.best-metric {
+    background-color: #d4edda;
+    font-weight: bold;
+}
+
+.prediction-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.symptom-group {
+    flex: 1;
+    min-width: 200px;
+}
+
+.symptom-group h4 {
+    margin-bottom: 10px;
+    color: #2c3e50;
+}
+
+.checkbox-item {
+    margin-bottom: 8px;
+}
+
+.checkbox-item label {
+    margin-left: 8px;
+}
+
+.predict-btn {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    margin-top: 20px;
+    transition: background-color 0.3s;
+    display: block;
+    width: 100%;
+}
+
+.predict-btn:hover {
+    background-color: #2980b9;
+}
+
+.result {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 5px;
+    background-color: #e8f4fc;
+}
+
+.result h4 {
+    margin-bottom: 10px;
+    color: #2c3e50;
+}
+
+.algorithm-result {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px dashed #bdc3c7;
+}
+
+.confidence {
+    font-size: 0.9em;
+    color: #7f8c8d;
+}
+
+footer {
+    text-align: center;
+    margin-top: 40px;
+    padding: 20px;
+    color: #7f8c8d;
+    font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+    .algorithm-cards {
+        flex-direction: column;
     }
-    .result-title {
-        font-size: 1.0rem;
-        font-weight: 700;
-        color: #1e3a8a;
-        margin-bottom: 8px;
+    
+    .card {
+        min-width: 100%;
     }
-    .result-item-label {
-        font-size: 0.85rem;
-        color: #374151;
-    }
-    .result-item-value {
-        font-size: 0.9rem;
-        font-weight: 700;
-        color: #111827;
-    }
-    .result-badge {
+    
+    .sample-table {
         font-size: 0.8rem;
-        font-weight: 600;
-        color: #1d4ed8;
     }
-    .result-conf {
-        font-size: 0.78rem;
-        color: #4b5563;
+    
+    .sample-table th, .sample-table td {
+        padding: 8px 5px;
     }
+}
+</style>
+""", unsafe_allow_html=True)
 
-    /* Footer */
-    .footer-text {
-        text-align: center;
-        font-size: 0.75rem;
-        color: #6b7280;
-        margin-top: 10px;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
+# =========================
+# HTML statis: header + tabel sampel + analisis algoritma
+# (langsung dari HTML asli, tanpa perubahan teks)
+# =========================
+st.markdown("""
+<div class="container">
+    <header>
+        <h1>Analisis Penerapan Algoritma Klasifikasi Penyakit</h1>
+        <p class="description">Perbandingan K-Nearest Neighbor, Decision Tree, dan Naïve Bayes dalam Klasifikasi Penyakit Berdasarkan Gejala</p>
+    </header>
+    
+    <section class="section">
+        <h2>Sampel Data Penyakit</h2>
+        <p>Berikut adalah 20 sampel data dari dataset klasifikasi penyakit berdasarkan gejala:</p>
+        
+        <table class="sample-table">
+            <thead>
+                <tr>
+                    <th>Demam</th>
+                    <th>Batuk</th>
+                    <th>Kelelahan</th>
+                    <th>Sakit Kepala</th>
+                    <th>Nyeri Tenggorokan</th>
+                    <th>Ruam</th>
+                    <th>Muntah</th>
+                    <th>Diare</th>
+                    <th>Sesak Napas</th>
+                    <th>Nyeri Dada</th>
+                    <th>Penyakit</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>Flu</td>
+                </tr>
+                <tr>
+                    <td>0</td><td>1</td><td>1</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>Flu</td>
+                </tr>
+                <tr>
+                    <td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td><td>Flu</td>
+                </tr>
+                <tr>
+                    <td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>Flu</td>
+                </tr>
+                <tr>
+                    <td>1</td><td>1</td><td>0</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>Flu</td>
+                </tr>
+                <tr>
+                    <td>1</td><td>0</td><td>1</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>Demam Berdarah</td>
+                </tr>
+                <tr>
+                    <td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>Demam Berdarah</td>
+                </tr>
+                <tr>
+                    <td>1</td><td>0</td><td>1</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>Demam Berdarah</td>
+                </tr>
+                <tr>
+                    <td>1</td><td>1</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td><td>COVID-19</td>
+                </tr>
+                <tr>
+                    <td>1</td><td>1</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td><td>COVID-19</td>
+                </tr>
+                <tr>
+                    <td>1</td><td>0</td><td>1</td><td>1</td><td>0</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td><td>Tifus</td>
+                </tr>
+                <tr>
+                    <td>1</td><td>0</td><td>1</td><td>1</td><td>0</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td><td>Tifus</td>
+                </tr>
+                <tr>
+                    <td>0</td><td>1</td><td>0</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>Alergi</td>
+                </tr>
+                <tr>
+                    <td>0</td><td>1</td><td>0</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>Alergi</td>
+                </tr>
+                <tr>
+                    <td>0</td><td>0</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>Migrain</td>
+                </tr>
+                <tr>
+                    <td>0</td><td>0</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>Migrain</td>
+                </tr>
+                <tr>
+                    <td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>0</td><td>0</td><td>Gastroenteritis</td>
+                </tr>
+                <tr>
+                    <td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td><td>0</td><td>Gastroenteritis</td>
+                </tr>
+                <tr>
+                    <td>0</td><td>0</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>Pneumonia</td>
+                </tr>
+                <tr>
+                    <td>1</td><td>1</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>Pneumonia</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+    
+    <section class="section">
+        <h2>Analisis Algoritma Klasifikasi</h2>
+        <p>Berikut adalah perbandingan performa tiga algoritma klasifikasi yang diterapkan pada dataset penyakit:</p>
+        
+        <div class="algorithm-cards">
+            <div class="card card-knn">
+                <h3>K-Nearest Neighbor (K-NN)</h3>
+                <p>Algoritma berbasis instance yang mengklasifikasikan data berdasarkan kedekatan dengan tetangga terdekat.</p>
+                <div class="metrics">
+                    <div class="metric">
+                        <span class="metric-name">Akurasi</span>
+                        <span class="metric-value">87.5%</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-name">Presisi</span>
+                        <span class="metric-value">85.2%</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-name">Recall</span>
+                        <span class="metric-value">86.8%</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-name">F1-Score</span>
+                        <span class="metric-value">86.0%</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card card-dt">
+                <h3>Decision Tree</h3>
+                <p>Algoritma berbasis pohon keputusan yang membagi data berdasarkan nilai atribut.</p>
+                <div class="metrics">
+                    <div class="metric">
+                        <span class="metric-name">Akurasi</span>
+                        <span class="metric-value">91.2%</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-name">Presisi</span>
+                        <span class="metric-value">90.5%</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-name">Recall</span>
+                        <span class="metric-value">89.8%</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-name">F1-Score</span>
+                        <span class="metric-value">90.1%</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card card-nb">
+                <h3>Naïve Bayes</h3>
+                <p>Algoritma probabilistik berdasarkan Teorema Bayes dengan asumsi independensi antar fitur.</p>
+                <div class="metrics">
+                    <div class="metric">
+                        <span class="metric-name">Akurasi</span>
+                        <span class="metric-value">83.7%</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-name">Presisi</span>
+                        <span class="metric-value">82.1%</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-name">Recall</span>
+                        <span class="metric-value">84.3%</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-name">F1-Score</span>
+                        <span class="metric-value">83.2%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <h3 style="margin-top: 30px;">Perbandingan Performa</h3>
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Metrik</th>
+                    <th>K-NN</th>
+                    <th>Decision Tree</th>
+                    <th>Naïve Bayes</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Akurasi</td>
+                    <td>87.5%</td>
+                    <td class="best-metric">91.2%</td>
+                    <td>83.7%</td>
+                </tr>
+                <tr>
+                    <td>Presisi</td>
+                    <td>85.2%</td>
+                    <td class="best-metric">90.5%</td>
+                    <td>82.1%</td>
+                </tr>
+                <tr>
+                    <td>Recall</td>
+                    <td>86.8%</td>
+                    <td class="best-metric">89.8%</td>
+                    <td>84.3%</td>
+                </tr>
+                <tr>
+                    <td>F1-Score</td>
+                    <td>86.0%</td>
+                    <td class="best-metric">90.1%</td>
+                    <td>83.2%</td>
+                </tr>
+                <tr>
+                    <td>Waktu Pelatihan</td>
+                    <td>Sedang</td>
+                    <td>Cepat</td>
+                    <td class="best-metric">Sangat Cepat</td>
+                </tr>
+                <tr>
+                    <td>Interpretabilitas</td>
+                    <td>Rendah</td>
+                    <td class="best-metric">Tinggi</td>
+                    <td>Sedang</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+""", unsafe_allow_html=True)
 
-# -------------------------------------------------
-# HEADER
-# -------------------------------------------------
-st.markdown("<div class='main-container'>", unsafe_allow_html=True)
+# =========================
+# Bagian interaktif: Simulasi Prediksi Penyakit
+# (logika diambil langsung dari script JS asli)
+# =========================
 
-st.markdown("<div class='badge'>Klasifikasi Penyakit Berbasis Gejala</div>", unsafe_allow_html=True)
-st.markdown(
-    "<div class='main-title'>Analisis Penerapan Algoritma Klasifikasi Penyakit</div>",
-    unsafe_allow_html=True
-)
-st.markdown(
-    "<div class='subtitle'>Perbandingan K-Nearest Neighbor, Decision Tree, dan Naïve Bayes "
-    "dalam Klasifikasi Penyakit Berdasarkan Gejala</div>",
-    unsafe_allow_html=True
-)
+st.markdown("""
+<section class="section">
+    <h2>Simulasi Prediksi Penyakit</h2>
+    <p>Pilih gejala yang dialami untuk melihat prediksi dari ketiga algoritma:</p>
+</section>
+""", unsafe_allow_html=True)
 
-st.markdown("<div class='soft-divider'></div>", unsafe_allow_html=True)
+with st.container():
+    col1, col2, col3 = st.columns(3)
 
-# -------------------------------------------------
-# KARTU PERBANDINGAN ALGORITMA
-# -------------------------------------------------
-st.markdown("**Ringkasan Performa Algoritma**")
-st.caption("Nilai berikut bersifat ilustratif sebagai gambaran performa model pada dataset klasifikasi penyakit.")
+    with col1:
+        st.markdown('<div class="symptom-group"><h4>Gejala Umum</h4>', unsafe_allow_html=True)
+        demam = st.checkbox("Demam")
+        batuk = st.checkbox("Batuk")
+        kelelahan = st.checkbox("Kelelahan")
+        sakit_kepala = st.checkbox("Sakit Kepala")
+        st.markdown('</div>', unsafe_allow_html=True)
 
-col1, col2, col3 = st.columns(3)
+    with col2:
+        st.markdown('<div class="symptom-group"><h4>Gejala Pernapasan & Pencernaan</h4>', unsafe_allow_html=True)
+        nyeri_tenggorokan = st.checkbox("Nyeri Tenggorokan")
+        sesak_napas = st.checkbox("Sesak Napas")
+        muntah = st.checkbox("Muntah")
+        diare = st.checkbox("Diare")
+        st.markdown('</div>', unsafe_allow_html=True)
 
-with col1:
-    st.markdown("<div class='algo-card'>", unsafe_allow_html=True)
-    st.markdown("<span class='algo-tag tag-knn'>KNN</span>", unsafe_allow_html=True)
-    st.markdown("<div class='algo-title'>K-Nearest Neighbor</div>", unsafe_allow_html=True)
-    st.markdown("<div class='algo-sub'>Mengklasifikasikan data berdasarkan kedekatan ke tetangga terdekat.</div>", unsafe_allow_html=True)
-    st.markdown(
-        """
-        <div class='metric-row'><span class='metric-name'>Akurasi</span><span class='metric-value'>87.5%</span></div>
-        <div class='metric-row'><span class='metric-name'>Presisi</span><span class='metric-value'>85.2%</span></div>
-        <div class='metric-row'><span class='metric-name'>Recall</span><span class='metric-value'>86.8%</span></div>
-        <div class='metric-row'><span class='metric-name'>F1-Score</span><span class='metric-value'>86.0%</span></div>
-        """,
-        unsafe_allow_html=True
-    )
-    st.markdown("</div>", unsafe_allow_html=True)
+    with col3:
+        st.markdown('<div class="symptom-group"><h4>Gejala Lainnya</h4>', unsafe_allow_html=True)
+        ruam = st.checkbox("Ruam")
+        nyeri_dada = st.checkbox("Nyeri Dada")
+        st.markdown('</div>', unsafe_allow_html=True)
 
-with col2:
-    st.markdown("<div class='algo-card'>", unsafe_allow_html=True)
-    st.markdown("<span class='algo-tag tag-dt'>Decision Tree</span>", unsafe_allow_html=True)
-    st.markdown("<div class='algo-title'>Decision Tree</div>", unsafe_allow_html=True)
-    st.markdown("<div class='algo-sub'>Membagi data berdasarkan aturan if–else dalam struktur pohon keputusan.</div>", unsafe_allow_html=True)
-    st.markdown(
-        """
-        <div class='metric-row'><span class='metric-name'>Akurasi</span><span class='metric-value'>91.2%</span></div>
-        <div class='metric-row'><span class='metric-name'>Presisi</span><span class='metric-value'>90.5%</span></div>
-        <div class='metric-row'><span class='metric-name'>Recall</span><span class='metric-value'>89.8%</span></div>
-        <div class='metric-row'><span class='metric-name'>F1-Score</span><span class='metric-value'>90.1%</span></div>
-        """,
-        unsafe_allow_html=True
-    )
-    st.markdown("</div>", unsafe_allow_html=True)
+# Tombol prediksi (mengganti button HTML asli)
+prediksi = st.button("Prediksi Penyakit", key="predict-btn")
 
-with col3:
-    st.markdown("<div class='algo-card'>", unsafe_allow_html=True)
-    st.markdown("<span class='algo-tag tag-nb'>Naïve Bayes</span>", unsafe_allow_html=True)
-    st.markdown("<div class='algo-title'>Naïve Bayes</div>", unsafe_allow_html=True)
-    st.markdown("<div class='algo-sub'>Model probabilistik berbasis Teorema Bayes dengan asumsi independensi antar fitur.</div>", unsafe_allow_html=True)
-    st.markdown(
-        """
-        <div class='metric-row'><span class='metric-name'>Akurasi</span><span class='metric-value'>83.7%</span></div>
-        <div class='metric-row'><span class='metric-name'>Presisi</span><span class='metric-value'>82.1%</span></div>
-        <div class='metric-row'><span class='metric-name'>Recall</span><span class='metric-value'>84.3%</span></div>
-        <div class='metric-row'><span class='metric-name'>F1-Score</span><span class='metric-value'>83.2%</span></div>
-        """,
-        unsafe_allow_html=True
-    )
-    st.markdown("</div>", unsafe_allow_html=True)
+knnPrediction = dtPrediction = nbPrediction = ""
+knnConfidence = dtConfidence = nbConfidence = ""
 
-st.markdown("</div>", unsafe_allow_html=True)  # Tutup main-container pertama
-
-# -------------------------------------------------
-# PANEL GEJALA & PREDIKSI
-# -------------------------------------------------
-st.markdown("<div class='main-container'>", unsafe_allow_html=True)
-
-st.markdown("<div class='section-title'>Simulasi Prediksi Penyakit</div>", unsafe_allow_html=True)
-st.markdown(
-    "<div class='section-caption'>Pilih kombinasi gejala yang dialami, kemudian jalankan simulasi untuk melihat prediksi "
-    "dari ketiga algoritma klasifikasi.</div>",
-    unsafe_allow_html=True
-)
-
-colg1, colg2, colg3 = st.columns(3)
-
-with colg1:
-    st.markdown("**Gejala Umum**")
-    demam = st.checkbox("Demam")
-    batuk = st.checkbox("Batuk")
-    kelelahan = st.checkbox("Kelelahan")
-    sakit_kepala = st.checkbox("Sakit Kepala")
-
-with colg2:
-    st.markdown("**Gejala Pernapasan & Pencernaan**")
-    nyeri_tenggorokan = st.checkbox("Nyeri Tenggorokan")
-    sesak_napas = st.checkbox("Sesak Napas")
-    muntah = st.checkbox("Muntah")
-    diare = st.checkbox("Diare")
-
-with colg3:
-    st.markdown("**Gejala Lainnya**")
-    ruam = st.checkbox("Ruam")
-    nyeri_dada = st.checkbox("Nyeri Dada")
-
-st.markdown("---")
-
-prediksi_btn = st.button("🔍 Jalankan Prediksi Penyakit")
-
-if prediksi_btn:
+if prediksi:
     symptoms = {
         "demam": demam,
         "batuk": batuk,
@@ -296,100 +553,99 @@ if prediksi_btn:
         "nyeriDada": nyeri_dada,
     }
 
-    symptom_count = sum(symptoms.values())
+    symptomCount = sum(1 for v in symptoms.values() if v)
 
-    if symptom_count == 0:
-        st.warning("Silakan pilih minimal satu gejala untuk melakukan simulasi prediksi.")
+    if symptomCount == 0:
+        st.warning("Pilih setidaknya satu gejala untuk prediksi.")
     else:
-        # Logika rule-based yang diadaptasi dari JavaScript HTML awal
-        if demam and batuk and nyeri_tenggorokan:
-            knnPrediction, knnConf = "Flu", "87%"
-            dtPrediction, dtConf = "Flu", "92%"
-            nbPrediction, nbConf = "Flu", "85%"
-
-        elif demam and ruam and (not batuk):
-            knnPrediction, knnConf = "Demam Berdarah", "82%"
-            dtPrediction, dtConf = "Demam Berdarah", "89%"
-            nbPrediction, nbConf = "Demam Berdarah", "79%"
-
-        elif demam and sesak_napas and batuk:
-            knnPrediction, knnConf = "COVID-19", "85%"
-            dtPrediction, dtConf = "COVID-19", "91%"
-            nbPrediction, nbConf = "COVID-19", "83%"
-
-        elif demam and muntah and diare:
-            knnPrediction, knnConf = "Gastroenteritis", "84%"
-            dtPrediction, dtConf = "Gastroenteritis", "88%"
-            nbPrediction, nbConf = "Gastroenteritis", "81%"
-
-        elif sakit_kepala and (not demam):
-            knnPrediction, knnConf = "Migrain", "79%"
-            dtPrediction, dtConf = "Migrain", "85%"
-            nbPrediction, nbConf = "Migrain", "76%"
-
-        elif sesak_napas and nyeri_dada:
-            knnPrediction, knnConf = "Pneumonia", "86%"
-            dtPrediction, dtConf = "Pneumonia", "90%"
-            nbPrediction, nbConf = "Pneumonia", "82%"
-
-        elif batuk and nyeri_tenggorokan and (not demam):
-            knnPrediction, knnConf = "Alergi", "81%"
-            dtPrediction, dtConf = "Alergi", "87%"
-            nbPrediction, nbConf = "Alergi", "78%"
-
-        elif demam and muntah and (not diare):
-            knnPrediction, knnConf = "Tifus", "83%"
-            dtPrediction, dtConf = "Tifus", "86%"
-            nbPrediction, nbConf = "Tifus", "80%"
-
+        # Logika prediksi diambil apa-adanya dari script JS
+        if symptoms["demam"] and symptoms["batuk"] and symptoms["nyeriTenggorokan"]:
+            knnPrediction = "Flu"
+            knnConfidence = "87%"
+            dtPrediction = "Flu"
+            dtConfidence = "92%"
+            nbPrediction = "Flu"
+            nbConfidence = "85%"
+        elif symptoms["demam"] and symptoms["ruam"] and not symptoms["batuk"]:
+            knnPrediction = "Demam Berdarah"
+            knnConfidence = "82%"
+            dtPrediction = "Demam Berdarah"
+            dtConfidence = "89%"
+            nbPrediction = "Demam Berdarah"
+            nbConfidence = "79%"
+        elif symptoms["demam"] and symptoms["sesakNapas"] and symptoms["batuk"]:
+            knnPrediction = "COVID-19"
+            knnConfidence = "85%"
+            dtPrediction = "COVID-19"
+            dtConfidence = "91%"
+            nbPrediction = "COVID-19"
+            nbConfidence = "83%"
+        elif symptoms["demam"] and symptoms["muntah"] and symptoms["diare"]:
+            knnPrediction = "Gastroenteritis"
+            knnConfidence = "84%"
+            dtPrediction = "Gastroenteritis"
+            dtConfidence = "88%"
+            nbPrediction = "Gastroenteritis"
+            nbConfidence = "81%"
+        elif symptoms["sakitKepala"] and not symptoms["demam"]:
+            knnPrediction = "Migrain"
+            knnConfidence = "79%"
+            dtPrediction = "Migrain"
+            dtConfidence = "85%"
+            nbPrediction = "Migrain"
+            nbConfidence = "76%"
+        elif symptoms["sesakNapas"] and symptoms["nyeriDada"]:
+            knnPrediction = "Pneumonia"
+            knnConfidence = "86%"
+            dtPrediction = "Pneumonia"
+            dtConfidence = "90%"
+            nbPrediction = "Pneumonia"
+            nbConfidence = "82%"
+        elif symptoms["batuk"] and symptoms["nyeriTenggorokan"] and not symptoms["demam"]:
+            knnPrediction = "Alergi"
+            knnConfidence = "81%"
+            dtPrediction = "Alergi"
+            dtConfidence = "87%"
+            nbPrediction = "Alergi"
+            nbConfidence = "78%"
+        elif symptoms["demam"] and symptoms["muntah"] and not symptoms["diare"]:
+            knnPrediction = "Tifus"
+            knnConfidence = "83%"
+            dtPrediction = "Tifus"
+            dtConfidence = "86%"
+            nbPrediction = "Tifus"
+            nbConfidence = "80%"
         else:
-            knnPrediction, knnConf = "Tidak dapat diprediksi dengan pasti", ""
-            dtPrediction, dtConf = "Tidak dapat diprediksi dengan pasti", ""
-            nbPrediction, nbConf = "Tidak dapat diprediksi dengan pasti", ""
+            knnPrediction = "Tidak dapat diprediksi dengan pasti"
+            knnConfidence = ""
+            dtPrediction = "Tidak dapat diprediksi dengan pasti"
+            dtConfidence = ""
+            nbPrediction = "Tidak dapat diprediksi dengan pasti"
+            nbConfidence = ""
 
-        st.markdown("<div class='result-card'>", unsafe_allow_html=True)
-        st.markdown("<div class='result-title'>Hasil Simulasi Prediksi Penyakit</div>", unsafe_allow_html=True)
+        # Hasil prediksi (layout sama dengan HTML)
+        st.markdown(f"""
+        <div class="result" id="prediction-result">
+            <h4>Hasil Prediksi:</h4>
+            <div class="algorithm-result">
+                <span>K-Nearest Neighbor:</span>
+                <span id="knn-result">{knnPrediction} <span class="confidence">{knnConfidence}</span></span>
+            </div>
+            <div class="algorithm-result">
+                <span>Decision Tree:</span>
+                <span id="dt-result">{dtPrediction} <span class="confidence">{dtConfidence}</span></span>
+            </div>
+            <div class="algorithm-result">
+                <span>Naïve Bayes:</span>
+                <span id="nb-result">{nbPrediction} <span class="confidence">{nbConfidence}</span></span>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
 
-        colr1, colr2, colr3 = st.columns(3)
-
-        with colr1:
-            st.markdown(
-                f"""
-                <div class='result-item-label'>K-Nearest Neighbor</div>
-                <div class='result-item-value'>{knnPrediction}</div>
-                <div class='result-conf'>Tingkat keyakinan: <strong>{knnConf}</strong></div>
-                """,
-                unsafe_allow_html=True
-            )
-
-        with colr2:
-            st.markdown(
-                f"""
-                <div class='result-item-label'>Decision Tree</div>
-                <div class='result-item-value'>{dtPrediction}</div>
-                <div class='result-conf'>Tingkat keyakinan: <strong>{dtConf}</strong></div>
-                """,
-                unsafe_allow_html=True
-            )
-
-        with colr3:
-            st.markdown(
-                f"""
-                <div class='result-item-label'>Naïve Bayes</div>
-                <div class='result-item-value'>{nbPrediction}</div>
-                <div class='result-conf'>Tingkat keyakinan: <strong>{nbConf}</strong></div>
-                """,
-                unsafe_allow_html=True
-            )
-
-        st.markdown("</div>", unsafe_allow_html=True)  # Tutup result-card
-
-st.markdown("</div>", unsafe_allow_html=True)  # Tutup main-container kedua
-
-# -------------------------------------------------
-# FOOTER
-# -------------------------------------------------
-st.markdown(
-    "<div class='footer-text'>Simulasi ini bersifat edukatif untuk memahami perbandingan algoritma klasifikasi penyakit berbasis gejala.</div>",
-    unsafe_allow_html=True
-)
+# Footer (dari HTML asli)
+st.markdown("""
+<footer>
+    <p>Analisis Klasifikasi Penyakit Berdasarkan Gejala &copy; 2023</p>
+</footer>
+</div>
+""", unsafe_allow_html=True)
